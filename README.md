@@ -1,49 +1,53 @@
-# makehuman-js
+# makehuman-js-new
 
-A library that builds human models in the browser.
+Modernized fork of [makehuman-js](https://github.com/makehuman-js/makehuman-js) — a JavaScript library that builds 3D human models in the browser.
 
-A live demo (NSFW while loading) is available at [mhwebui.wassname.com](http://mhwebui.wassname.com/)
-
-An an example of how to use this library is in the [example repository](https://github.com/makehuman-js/makehuman-js-example).
+The original project by [wassname](https://github.com/wassname) hasn't been updated since 2017. This fork brings it to 2026 with modern tooling and dependencies.
 
 ![](docs/images/ui-screenshot.png)
 
-# Status
+## What's Changed
 
-This is a alpha product.
+- **Three.js** updated to `r175` (from r87)
+- **Webpack 5** with modern config (from Webpack 2)
+- **Babel 7** with `@babel/preset-env` (from Babel 6)
+- **ESLint 8** with Airbnb config
+- **Tween.js** updated to `@tweenjs/tween.js@25` (from old tween.js)
+- All dependencies updated to current versions
+- Build and dev-server work on modern Node.js (18+)
 
-# Usage
+## Original Project
 
-An example of how to use the library is available at [makehuman-js/makehuman-js-example](https://github.com/makehuman-js/makehuman-js-example).
+- **Repo:** [makehuman-js/makehuman-js](https://github.com/makehuman-js/makehuman-js)
+- **Author:** Mike Clark ([wassname](https://github.com/wassname))
+- **Original demo:** [mhwebui.wassname.com](http://mhwebui.wassname.com/)
+- **Example:** [makehuman-js-example](https://github.com/makehuman-js/makehuman-js-example)
 
-# Tests
+## Usage
 
-- clone
-- `npm install`
-- `npm test` (or on windows use `npm run test_windows`)
-- this will launch a browser which will run mocha unit tests
+```bash
+git clone https://github.com/HippocampusEvolve/makehuman-js-new.git
+cd makehuman-js-new
+npm install
+npm start        # dev server with hot reload
+npm run build    # production build
+npm test         # run tests in browser
+```
 
-# Questions
+## Tests
 
-Please log issues on github and ask questions on stackoverflow. Otherwise questions can be sent to "makehuman.js at wassname dot org".
+```bash
+npm test
+```
 
-# Contributing
+This launches a browser with mocha unit tests.
 
-We welcome contributions as pull request or issues reporting issues you might come across. All contributors of code must agree to the licensing terms.
+## Acknowledgement
 
-# Acknowledgement
+This project is based on [makehuman-js](https://github.com/makehuman-js/makehuman-js) by wassname, which was inspired by the desktop Python software [makehuman.org](http://www.makehuman.org/). Data and models are provided by the MakeHuman project — thanks to all contributors listed [here](http://www.makehuman.org/halloffame.php).
 
-This browser software is inspired by the desktop python software makehuman.org. It also depends on a makehuman-data package which provides data from makehuman. Thanks to major contributors to makehuman who can be found [here](http://www.makehuman.org/halloffame.php) and all the minor contributions.
+## License
 
+AGPLv3 — same as the original project. See the original repo for full license terms.
 
-# Licensing
-
-(This license is for the makehuman-js code, outputs are CC0, the data/models remain under the makehuman project licence)
-
-Copyright 2016-2017 Mike Clark (wassname)
-
-It is open source and free to use as it is licensed under the AGPLv3.
-
-Alternative commercial license terms are available from if you wish to redistribute it as part of a proprietary closed source product or deliver software software-as-a-service (SaaS) using it as part of a proprietary closed source service.
-
-Projects or startups in the first two years or making under $2000/year, get a free commercial license. Just message me and let me know your using it.
+Code outputs are CC0. Data/models remain under the MakeHuman project license.
