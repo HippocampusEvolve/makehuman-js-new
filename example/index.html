@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>makehuman-js-new — character demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="viewport"></div>
+
+  <aside id="panel">
+    <header>
+      <h1>makehuman-js</h1>
+      <p class="sub">real MakeHuman mesh, morph targets and clothing — in the browser</p>
+    </header>
+
+    <section>
+      <h2>Body</h2>
+      <label class="row" data-mod="macrodetails/Gender">
+        <span>Gender</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+      <label class="row" data-mod="macrodetails/Age">
+        <span>Age</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+      <label class="row" data-mod="macrodetails-height/Height">
+        <span>Height</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+      <label class="row" data-mod="macrodetails-universal/Weight">
+        <span>Weight</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+      <label class="row" data-mod="macrodetails-universal/Muscle">
+        <span>Muscle</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+      <label class="row" data-mod="macrodetails-proportions/BodyProportions">
+        <span>Proportions</span><input type="range" min="0" max="1" step="0.01" value="0.5"><b>0.50</b>
+      </label>
+    </section>
+
+    <section>
+      <h2>Wardrobe</h2>
+      <div id="outfits" class="chips"></div>
+    </section>
+
+    <section>
+      <h2>Pose</h2>
+      <select id="pose"></select>
+      <div class="buttons">
+        <button id="randomize" type="button">Randomize body</button>
+        <button id="spin" type="button" class="ghost">Stop spin</button>
+      </div>
+    </section>
+
+    <footer>
+      <span id="status">loading base mesh…</span>
+    </footer>
+  </aside>
+
+  <!-- three r82 and the library bundle, both served from this repository -->
+  <script src="../node_modules/three/build/three.js"></script>
+  <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
+  <script src="../dist/makehuman.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

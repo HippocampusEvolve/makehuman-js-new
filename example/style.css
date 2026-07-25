@@ -1,0 +1,166 @@
+:root {
+  --bg: #0d1117;
+  --panel: #151b23;
+  --line: #232c38;
+  --text: #e6edf3;
+  --muted: #8b98a5;
+  --accent: #6ee7c7;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+body { display: flex; }
+
+#viewport {
+  flex: 1 1 auto;
+  position: relative;
+  min-width: 0;
+}
+
+#viewport canvas { display: block; }
+
+#panel {
+  flex: 0 0 300px;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  padding: 18px 16px 12px;
+}
+
+#panel header h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+#panel header .sub {
+  margin: 4px 0 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#panel h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#panel section {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 78px 1fr 38px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+  font-size: 13px;
+}
+
+.row b {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  text-align: right;
+  font-size: 12px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--line);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chips button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chips button:hover { border-color: var(--accent); }
+
+.chips button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+select {
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+.buttons { display: flex; gap: 6px; margin-top: 10px; }
+
+.buttons button {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--accent);
+  color: #06231c;
+  border-radius: 6px;
+  padding: 7px 8px;
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+}
+
+.buttons button.ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+#panel footer {
+  color: var(--muted);
+  font-size: 11px;
+  border: 0;
+}
+
+#status.busy { color: var(--accent); }

@@ -20,6 +20,7 @@
     "watch": "webpack --progress --watch",
     "build": "webpack --progress",
     "build:debug": "webpack --show-errors",
+    "example": "node example/serve.mjs",
     "release": "NODE_ENV=production webpack --progress",
     "release_windows": "NODE_ENV=production webpack --progress",
     "test": "./node_modules/.bin/webpack-dev-server --config webpack.test.config.js --open",
