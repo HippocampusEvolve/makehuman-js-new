@@ -1,20 +1,32 @@
 # makehuman-js-new
 
-Modernized fork of [makehuman-js](https://github.com/makehuman-js/makehuman-js) — a JavaScript library that builds 3D human models in the browser.
+[![CI](https://github.com/HippocampusEvolve/makehuman-js-new/actions/workflows/ci.yml/badge.svg)](https://github.com/HippocampusEvolve/makehuman-js-new/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 
-The original project by [wassname](https://github.com/wassname) hasn't been updated since 2017. This fork brings it to 2026 with modern tooling and dependencies.
+Fork of [makehuman-js](https://github.com/makehuman-js/makehuman-js) — a JavaScript library that
+builds 3D human models in the browser — kept buildable on current Node.js.
+
+The original project by [wassname](https://github.com/wassname) hasn't been updated since 2017.
 
 ![](docs/images/ui-screenshot.png)
 
-## What's Changed
+## Status
 
-- **Three.js** updated to `r175` (from r87)
-- **Webpack 5** with modern config (from Webpack 2)
-- **Babel 7** with `@babel/preset-env` (from Babel 6)
-- **ESLint 8** with Airbnb config
-- **Tween.js** updated to `@tweenjs/tween.js@25` (from old tween.js)
-- All dependencies updated to current versions
-- Build and dev-server work on modern Node.js (18+)
+This fork is a **working baseline, not a rewrite**. The source and the toolchain are still the
+original 2017 ones; what this repo adds is a verified answer to "does it still build?".
+
+| | Version here | Notes |
+|---|---|---|
+| Three.js | `^0.82.1` (r82) | the code targets the pre-r125 API (`Geometry`, old materials) |
+| Webpack | `2.1.0-beta.21` | builds `makehuman.js` (2.6 MB) without patching |
+| Babel | 6 (`es2015` + `stage-1` presets) | |
+| ESLint | 3 with `airbnb` config | |
+| Node.js | 18 / 20 / 22 | `npm ci && npm run build` verified in CI on all three |
+
+Planned, in rough order: Webpack 5 + Babel 7 (mechanical), ESLint 9 flat config, then Three.js
+r1xx — the last one is the expensive step, because everything after r125 removed `Geometry` and
+reworked the material and loader APIs this code is built on. Until that lands, the README will
+not claim it.
 
 ## Original Project
 
@@ -28,19 +40,14 @@ The original project by [wassname](https://github.com/wassname) hasn't been upda
 ```bash
 git clone https://github.com/HippocampusEvolve/makehuman-js-new.git
 cd makehuman-js-new
-npm install
+npm ci
+npm run build    # bundle to dist/makehuman.js
 npm start        # dev server with hot reload
-npm run build    # production build
-npm test         # run tests in browser
+npm test         # opens a browser with the mocha suite
 ```
 
-## Tests
-
-```bash
-npm test
-```
-
-This launches a browser with mocha unit tests.
+`npm run build` is the path covered by CI. `npm start` and `npm test` both rely on
+`webpack-dev-server@2.1.0-beta` and open a browser, so they are not run there.
 
 ## Acknowledgement
 
@@ -48,6 +55,6 @@ This project is based on [makehuman-js](https://github.com/makehuman-js/makehuma
 
 ## License
 
-AGPLv3 — same as the original project. See the original repo for full license terms.
+[AGPL-3.0](LICENSE) — same as the original project.
 
 Code outputs are CC0. Data/models remain under the MakeHuman project license.
