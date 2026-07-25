@@ -8,12 +8,34 @@ builds 3D human models in the browser — kept buildable on current Node.js.
 
 The original project by [wassname](https://github.com/wassname) hasn't been updated since 2017.
 
-![](docs/images/ui-screenshot.png)
+![makehuman-js demo: real MakeHuman mesh with clothing, reshaped live](docs/preview.gif)
+
+The figure above is the **real MakeHuman base mesh** — 19 158 vertices, 138 MB of morph
+targets, and fitted garments from `makehuman-data` — running in a browser, not a procedural
+stand-in.
+
+## Demo
+
+```bash
+npm ci
+npm run build      # bundles dist/makehuman.js
+npm run example    # serves http://127.0.0.1:8080/example/
+```
+
+[`example/`](example/) is a ~250-line page with no dependencies beyond what this repo already
+ships: three r82 from `node_modules`, the bundle from `dist/`, and the meshes, morph targets
+and clothing from `node_modules/makehuman-data`. Sliders (gender, age, height, weight, muscle,
+proportions) reshape the mesh live; the wardrobe buttons swap outfits, hair and eyebrows.
+
+The upstream [makehuman-js-example](https://github.com/makehuman-js/makehuman-js-example)
+needs six CDN libraries and an `npm install` that fails on node-gyp in 2026, which is why this
+one lives in-tree.
 
 ## Status
 
 This fork is a **working baseline, not a rewrite**. The source and the toolchain are still the
-original 2017 ones; what this repo adds is a verified answer to "does it still build?".
+original 2017 ones; what this repo adds is a verified answer to "does it still build?" and a
+demo that proves the library still renders.
 
 | | Version here | Notes |
 |---|---|---|
@@ -27,6 +49,20 @@ Planned, in rough order: Webpack 5 + Babel 7 (mechanical), ESLint 9 flat config,
 r1xx — the last one is the expensive step, because everything after r125 removed `Geometry` and
 reworked the material and loader APIs this code is built on. Until that lands, the README will
 not claim it.
+
+### Known defects
+
+Found while building the demo; all of them are upstream behaviour, not regressions of this fork:
+
+- **Poses tear the hands apart.** `setPose()` writes each pose quaternion into `bone.parent`
+  (`src/js/human/human.js`), and along the wrist/finger chain the result is wrists and fingers
+  stretched into long ribbons. Every pose in `makehuman-data` is affected, so the demo starts in
+  rest pose; picking a pose in the UI reproduces it. The body, clothing and face are unaffected.
+- **Loading a clothing proxy corrupts unrelated scene geometry.** A `THREE.GridHelper` added to
+  the same scene came back with the garment's 50 016 vertices in its buffer and rendered as a
+  white wireframe shirt under the model. The demo keeps the scene minimal because of it.
+- **`setPose()` logs `couldnt find bone metatarsal*`** — the poses reference foot bones the
+  skeleton does not carry. Harmless, but noisy.
 
 ## Original Project
 
