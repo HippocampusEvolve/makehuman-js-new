@@ -50,43 +50,44 @@ async function exportArms(recipePath, destination) {
   const png = await sharp(path.resolve(path.dirname(skinFile), spec.mapDiffuse)).resize({ width: 1024, height: 1024, fit: 'inside', withoutEnlargement: true }).png({ compressionLevel: 9 }).toBuffer()
   g.images.push({ name: 'skin', mimeType: 'image/png', bufferView: writer.view(png) })
   g.textures.push({ source: 0, sampler: 0 })
-  g.materials.push({ name: 'skin', pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], baseColorTexture: { index: 0 }, metallicFactor: 0, roughnessFactor: .82 } })
-
-  // Faces of the skin material whose three vertices all belong mostly to an arm bone.
-  const geo = h.geometry, isArm = bones.map(b => ARM.test(b.name))
-  const faces = geo.faces.map((f, i) => f.materialIndex === 0 && [f.a, f.b, f.c].every(vi => isArm[dominantJoint(geo, vi)]) ? i : -1).filter(i => i >= 0)
-  if (!faces.length) {
-    const tally = {}
-    for (const f of geo.faces.filter(f => f.materialIndex === 0).slice(0, 4000)) tally[bones[dominantJoint(geo, f.a)].name] = (tally[bones[dominantJoint(geo, f.a)].name] || 0) + 1
-    throw new Error('No arm faces; skin faces: ' + geo.faces.filter(f => f.materialIndex === 0).length + '; dominant joints sample: ' + JSON.stringify(tally))
+  // One primitive per arm so the game can dress each hand separately (gloves, signs).
+  const geo = h.geometry
+  const faces = geo.faces.map((f, i) => f.materialIndex === 0 && [f.a, f.b, f.c].every(vi => ARM.test(bones[dominantJoint(geo, vi)].name)) ? i : -1).filter(i => i >= 0)
+  if (!faces.length) throw new Error('No arm faces; skin faces: ' + geo.faces.filter(f => f.materialIndex === 0).length)
+  const primitives = [], stats = { vertices: 0, triangles: 0 }
+  for (const side of ['L', 'R']) {
+    const mat = g.materials.push({ name: 'skin.' + side, pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], baseColorTexture: { index: 0 }, metallicFactor: 0, roughnessFactor: .82 } }) - 1
+    const position = [], normal = [], uv = [], joints = [], weights = [], indices = [], cache = new Map()
+    for (const fi of faces) {
+      const f = geo.faces[fi]
+      if (!bones[dominantJoint(geo, f.a)].name.includes('.' + side)) continue
+      ;[f.a, f.b, f.c].forEach((vi, corner) => {
+        const p = geo.vertices[vi], n = f.vertexNormals[corner] || f.normal, t = geo.faceVertexUvs[0]?.[fi]?.[corner] || new THREE.Vector2()
+        const key = [vi, n.x.toFixed(6), n.y.toFixed(6), n.z.toFixed(6), t.x, t.y].join(',')
+        let index = cache.get(key)
+        if (index === undefined) {
+          index = position.length / 3; cache.set(key, index)
+          position.push(...p.toArray()); normal.push(...n.clone().normalize().toArray()); uv.push(t.x, 1 - t.y)
+          const js = geo.skinIndices[vi].toArray(), ws = geo.skinWeights[vi].toArray(), sum = ws.reduce((a, b) => a + b, 0)
+          if (sum <= 0) throw new Error('Unweighted vertex ' + vi)
+          joints.push(...js); weights.push(...ws.map(w => w / sum))
+        }
+        indices.push(index)
+      })
+    }
+    const attributes = { POSITION: writer.accessor(position, 'VEC3', 5126, 34962), NORMAL: writer.accessor(normal, 'VEC3', 5126, 34962),
+      TEXCOORD_0: writer.accessor(uv, 'VEC2', 5126, 34962), JOINTS_0: writer.accessor(joints, 'VEC4', 5123, 34962), WEIGHTS_0: writer.accessor(weights, 'VEC4', 5126, 34962) }
+    primitives.push({ attributes, indices: writer.accessor(indices, 'SCALAR', position.length / 3 > 65535 ? 5125 : 5123, 34963), material: mat })
+    stats.vertices += position.length / 3; stats.triangles += indices.length / 3
   }
-  const position = [], normal = [], uv = [], joints = [], weights = [], indices = [], cache = new Map()
-  for (const fi of faces) {
-    const f = geo.faces[fi]
-    ;[f.a, f.b, f.c].forEach((vi, corner) => {
-      const p = geo.vertices[vi], n = f.vertexNormals[corner] || f.normal, t = geo.faceVertexUvs[0]?.[fi]?.[corner] || new THREE.Vector2()
-      const key = [vi, n.x.toFixed(6), n.y.toFixed(6), n.z.toFixed(6), t.x, t.y].join(',')
-      let index = cache.get(key)
-      if (index === undefined) {
-        index = position.length / 3; cache.set(key, index)
-        position.push(...p.toArray()); normal.push(...n.clone().normalize().toArray()); uv.push(t.x, 1 - t.y)
-        const js = geo.skinIndices[vi].toArray(), ws = geo.skinWeights[vi].toArray(), sum = ws.reduce((a, b) => a + b, 0)
-        if (sum <= 0) throw new Error('Unweighted vertex ' + vi)
-        joints.push(...js); weights.push(...ws.map(w => w / sum))
-      }
-      indices.push(index)
-    })
-  }
-  const attributes = { POSITION: writer.accessor(position, 'VEC3', 5126, 34962), NORMAL: writer.accessor(normal, 'VEC3', 5126, 34962),
-    TEXCOORD_0: writer.accessor(uv, 'VEC2', 5126, 34962), JOINTS_0: writer.accessor(joints, 'VEC4', 5123, 34962), WEIGHTS_0: writer.accessor(weights, 'VEC4', 5126, 34962) }
-  g.meshes.push({ name: 'arms', primitives: [{ attributes, indices: writer.accessor(indices, 'SCALAR', position.length / 3 > 65535 ? 5125 : 5123, 34963), material: 0 }] })
+  g.meshes.push({ name: 'arms', primitives })
   g.scenes[0].nodes.push(g.nodes.push({ name: 'arms', mesh: 0, skin: 0 }) - 1)
 
   const glb = writer.finish()
   fs.mkdirSync(destination, { recursive: true })
   fs.writeFileSync(path.join(destination, 'arms.raw.glb'), glb)
   const world = name => { const b = bones.find(b => b.name === name); const v = new THREE.Vector3(); b.updateMatrixWorld(true); v.setFromMatrixPosition(b.matrixWorld); return v.multiplyScalar(.1).toArray().map(x => +x.toFixed(3)) }
-  const report = { file: path.resolve(destination, 'arms.raw.glb'), bytes: glb.length, vertices: position.length / 3, triangles: indices.length / 3, bones: bones.length,
+  const report = { file: path.resolve(destination, 'arms.raw.glb'), bytes: glb.length, vertices: stats.vertices, triangles: stats.triangles, bones: bones.length,
     armBones: bones.filter(b => ARM.test(b.name)).length, worldMetres: Object.fromEntries(['head', 'eye.R', 'upperarm01.R', 'upperarm01.L', 'lowerarm01.R', 'wrist.R', 'finger3-3.R', 'finger1-3.R'].map(n => [n, world(n)])) }
   fs.writeFileSync(path.join(destination, 'report.json'), JSON.stringify(report, null, 2) + '\n')
   console.log(JSON.stringify(report, null, 2))
